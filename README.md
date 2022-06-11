@@ -1,1 +1,1 @@
-# Projekt-SOP---Game-of-Life-
+# Projekt SOP - Game-of-Life

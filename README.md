@@ -1,4 +1,4 @@
-# Projekt SOP - Game of Life
+# Projekt POJ - Game of Life
 
 Reguły gry według Conwaya:
 

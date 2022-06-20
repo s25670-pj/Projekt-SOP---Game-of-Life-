@@ -27,6 +27,16 @@ public class GUIOfGame extends javax.swing.JFrame {
         offScreenGraphics.setColor(boardPanel.getBackground());
         offScreenGraphics.fillRect(0, 0, boardPanel.getWidth(), boardPanel.getHeight());
         
+        for(int i = 0 ; i < height ; i++){
+            for(int j = 0 ; j < width; j++){
+                if(currentState[i][j]){
+                    offScreenGraphics.setColor(Color.BLUE);
+                    int x = j * boardPanel.getWidth()/width;
+                    int y = i * boardPanel.getHeight()/height;
+                    offScreenGraphics.fillRect(x, y, boardPanel.getWidth()/width, boardPanel.getHeight()/height);
+                }
+            }
+        }
         
         offScreenGraphics.setColor(Color.BLACK); //rysowanie siatki
         for(int i = 1; i < height;i++){
@@ -50,7 +60,7 @@ public class GUIOfGame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        boardPanel.setBackground(new java.awt.Color(153, 153, 153));
+        boardPanel.setBackground(new java.awt.Color(219, 237, 255));
         boardPanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 boardPanelMouseClicked(evt);
@@ -108,6 +118,9 @@ public class GUIOfGame extends javax.swing.JFrame {
     }// </editor-fold>                        
 
     private void boardPanelMouseClicked(java.awt.event.MouseEvent evt) {                                        
+        int j = width * evt.getX() / boardPanel.getWidth();
+        int i = height * evt.getY() / boardPanel.getHeight();
+        currentState[i][j] =! currentState[i][j];
         display();
     }                                       
 

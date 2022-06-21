@@ -1,8 +1,11 @@
 package com.mycompany.gameoflife;
 
+import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Color;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GUIOfGame extends javax.swing.JFrame {
     
@@ -21,6 +24,28 @@ public class GUIOfGame extends javax.swing.JFrame {
     
         offScreenImage = createImage(boardPanel.getWidth(), boardPanel.getHeight());
         offScreenGraphics = offScreenImage.getGraphics();
+        
+        Timer time = new Timer();
+        
+        TimerTask task = new TimerTask(){
+            public void run(){
+                if(play){
+                    for(int i = 0; i < height; i++){
+                        for(int j = 0; j < width; j++){
+                            nextState[i][j] = rules(i,j);
+                        }
+                    }
+                    for(int i = 0; i < height; i++){
+                        for(int j = 0; j < width; j++){
+                            currentState[i][j] = nextState[i][j];
+                        }
+                    }
+                    display();
+                }
+            }
+        };
+        time.scheduleAtFixedRate(task, 0, 100);
+        display();
     }
     
     void display(){
@@ -30,7 +55,7 @@ public class GUIOfGame extends javax.swing.JFrame {
         for(int i = 0 ; i < height ; i++){
             for(int j = 0 ; j < width; j++){
                 if(currentState[i][j]){
-                    offScreenGraphics.setColor(Color.BLUE);
+                    offScreenGraphics.setColor(Color.WHITE);
                     int x = j * boardPanel.getWidth()/width;
                     int y = i * boardPanel.getHeight()/height;
                     offScreenGraphics.fillRect(x, y, boardPanel.getWidth()/width, boardPanel.getHeight()/height);
@@ -50,6 +75,46 @@ public class GUIOfGame extends javax.swing.JFrame {
         
         boardPanel.getGraphics().drawImage(offScreenImage,0,0,boardPanel);
     }
+    
+    private boolean rules(int i, int j){
+        int neighbors = 0;
+        
+        if(j > 0){
+            if(currentState[i][j-1])
+                neighbors++;
+            if(i > 0) 
+                if(currentState[i-1][j-1])
+                    neighbors++;
+            if(i < height - 1)
+                if(currentState[i+1][j-1])
+                    neighbors++;
+        }
+        if(j < width - 1){
+            if(currentState[i][j+1])
+                neighbors++;
+            if(i>0)
+                if(currentState[i-1][j+1])
+                    neighbors++;
+            if(i<height-1)
+                if(currentState[i+1][j+1])
+                    neighbors++;
+        }
+        if(i > 0)
+            if(currentState[i-1][j])
+                neighbors++;
+        if(i < height - 1)
+            if(currentState[i+1][j])
+                neighbors++;
+        
+        if(neighbors == 3)
+            return true;
+        
+        if(currentState[i][j] && neighbors == 2)
+            return true;
+        
+        return false;
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
@@ -60,7 +125,12 @@ public class GUIOfGame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        boardPanel.setBackground(new java.awt.Color(219, 237, 255));
+        boardPanel.setBackground(new java.awt.Color(51, 51, 51));
+        boardPanel.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                boardPanelMouseDragged(evt);
+            }
+        });
         boardPanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 boardPanelMouseClicked(evt);
@@ -84,8 +154,18 @@ public class GUIOfGame extends javax.swing.JFrame {
         );
 
         startButton.setText("Start");
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonActionPerformed(evt);
+            }
+        });
 
         clearButton.setText("Clear");
+        clearButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -129,6 +209,29 @@ public class GUIOfGame extends javax.swing.JFrame {
         offScreenGraphics = offScreenImage.getGraphics();
         display();
     }                                           
+
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        play = !play;
+        if(play) startButton.setText("Stop");
+        else startButton.setText("Start");
+        display();
+    }                                           
+
+    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        currentState = new boolean[height][width];
+        display();
+    }                                           
+
+    private void boardPanelMouseDragged(java.awt.event.MouseEvent evt) {                                        
+        int j = width * evt.getX() / boardPanel.getWidth();
+        int i = height * evt.getY() / boardPanel.getHeight();
+        
+        if(SwingUtilities.isLeftMouseButton(evt))
+            currentState[i][j] = true;
+        else
+            currentState[i][j] = false;
+        display();
+    }                                       
 
     
     public static void main(String args[]) {
